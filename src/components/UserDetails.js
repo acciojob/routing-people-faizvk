@@ -7,35 +7,28 @@ export default function UserDetails() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true); // <-- set loading before fetching
     setUser(null);
-    setLoading(true);
+
     fetch(`https://jsonplaceholder.typicode.com/users/${id}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Network error");
-        return res.json();
+      .then((res) => res.json())
+      .then((data) => {
+        setUser(data);
+        setLoading(false); // <-- turn off loading after data arrives
       })
-      .then((json) => {
-        setUser(json);
-        setLoading(false);
-      })
-      .catch(() => {
-        setUser(null);
-        setLoading(false);
-      });
+      .catch(() => setLoading(false));
   }, [id]);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  // ✅ Render loading state first
+  if (loading) return <div>Loading...</div>;
 
-  if (!user) {
+  if (!user)
     return (
       <div>
         <h1>User not found</h1>
         <Link to="/">Back</Link>
       </div>
     );
-  }
 
   return (
     <div>
